@@ -1,7 +1,9 @@
 package com.paymentdemo.strategy;
 
+import com.paymentdemo.model.PaymentResult;
+
 import java.math.BigDecimal;
 
 public interface PaymentStrategy {
-    void pay(BigDecimal amount);
+    PaymentResult pay(BigDecimal amount);
 }

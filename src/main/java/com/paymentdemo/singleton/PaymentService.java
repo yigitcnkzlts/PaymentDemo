@@ -1,6 +1,7 @@
 package com.paymentdemo.singleton;
 
 import com.paymentdemo.factory.PaymentFactory;
+import com.paymentdemo.model.PaymentResult;
 import com.paymentdemo.model.PaymentType;
 import com.paymentdemo.strategy.PaymentStrategy;
 
@@ -18,10 +19,10 @@ public final class PaymentService {
         return InstanceHolder.INSTANCE;
     }
 
-    public void processPayment(PaymentType paymentType, BigDecimal amount) {
+    public PaymentResult processPayment(PaymentType paymentType, BigDecimal amount) {
         validateAmount(amount);
         PaymentStrategy paymentStrategy = PaymentFactory.createPayment(paymentType);
-        paymentStrategy.pay(amount);
+        return paymentStrategy.pay(amount);
     }
 
     private void validateAmount(BigDecimal amount) {

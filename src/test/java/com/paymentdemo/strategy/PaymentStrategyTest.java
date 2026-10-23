@@ -1,53 +1,52 @@
 package com.paymentdemo.strategy;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import com.paymentdemo.model.PaymentResult;
+import com.paymentdemo.model.PaymentStatus;
+import com.paymentdemo.model.PaymentType;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class PaymentStrategyTest {
-    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
-    private PrintStream originalOutput;
+    @Test
+    void creditCardShouldReturnExpectedPaymentResult() {
+        BigDecimal amount = new BigDecimal("500.00");
 
-    @BeforeEach
-    void redirectOutput() throws Exception {
-        originalOutput = System.out;
-        System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
-    }
+        PaymentResult result = new CreditCardPayment().pay(amount);
 
-    @AfterEach
-    void restoreOutput() {
-        System.setOut(originalOutput);
+        assertSuccessfulResult(result, PaymentType.CREDIT_CARD, amount,
+                "Kredi kartı ile ödeme başarılı.");
     }
 
     @Test
-    void creditCardShouldPrintSuccessMessage() {
-        new CreditCardPayment().pay(new BigDecimal("500.00"));
+    void bankTransferShouldReturnExpectedPaymentResult() {
+        BigDecimal amount = new BigDecimal("250");
 
-        assertEquals("Kredi kartı ile 500 TL ödeme başarılı.", printedLine());
+        PaymentResult result = new BankTransferPayment().pay(amount);
+
+        assertSuccessfulResult(result, PaymentType.BANK_TRANSFER, amount,
+                "Havale / EFT ile ödeme başarılı.");
     }
 
     @Test
-    void bankTransferShouldPrintSuccessMessage() {
-        new BankTransferPayment().pay(new BigDecimal("250"));
+    void digitalWalletShouldReturnExpectedPaymentResult() {
+        BigDecimal amount = new BigDecimal("75.50");
 
-        assertEquals("Havale / EFT ile 250 TL ödeme başarılı.", printedLine());
+        PaymentResult result = new DigitalWalletPayment().pay(amount);
+
+        assertSuccessfulResult(result, PaymentType.DIGITAL_WALLET, amount,
+                "Dijital cüzdan ile ödeme başarılı.");
     }
 
-    @Test
-    void digitalWalletShouldPrintSuccessMessage() {
-        new DigitalWalletPayment().pay(new BigDecimal("75.50"));
-
-        assertEquals("Dijital cüzdan ile 75.5 TL ödeme başarılı.", printedLine());
-    }
-
-    private String printedLine() {
-        return output.toString(StandardCharsets.UTF_8).strip();
+    private void assertSuccessfulResult(PaymentResult result, PaymentType paymentType,
+                                        BigDecimal amount, String message) {
+        assertNotNull(result.transactionId());
+        assertEquals(paymentType, result.paymentType());
+        assertEquals(amount, result.amount());
+        assertEquals(PaymentStatus.SUCCESS, result.status());
+        assertEquals(message, result.message());
     }
 }

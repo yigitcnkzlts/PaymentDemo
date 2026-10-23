@@ -1,14 +1,16 @@
 package com.paymentdemo.strategy;
 
+import com.paymentdemo.model.PaymentResult;
+import com.paymentdemo.model.PaymentStatus;
+import com.paymentdemo.model.PaymentType;
+
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class BankTransferPayment implements PaymentStrategy {
     @Override
-    public void pay(BigDecimal amount) {
-        System.out.printf("Havale / EFT ile %s TL ödeme başarılı.%n", format(amount));
-    }
-
-    private String format(BigDecimal amount) {
-        return amount.stripTrailingZeros().toPlainString();
+    public PaymentResult pay(BigDecimal amount) {
+        return new PaymentResult(UUID.randomUUID(), PaymentType.BANK_TRANSFER, amount,
+                PaymentStatus.SUCCESS, "Havale / EFT ile ödeme başarılı.");
     }
 }

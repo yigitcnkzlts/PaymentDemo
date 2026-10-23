@@ -1,14 +1,16 @@
 package com.paymentdemo.strategy;
 
+import com.paymentdemo.model.PaymentResult;
+import com.paymentdemo.model.PaymentStatus;
+import com.paymentdemo.model.PaymentType;
+
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class DigitalWalletPayment implements PaymentStrategy {
     @Override
-    public void pay(BigDecimal amount) {
-        System.out.printf("Dijital cüzdan ile %s TL ödeme başarılı.%n", format(amount));
-    }
-
-    private String format(BigDecimal amount) {
-        return amount.stripTrailingZeros().toPlainString();
+    public PaymentResult pay(BigDecimal amount) {
+        return new PaymentResult(UUID.randomUUID(), PaymentType.DIGITAL_WALLET, amount,
+                PaymentStatus.SUCCESS, "Dijital cüzdan ile ödeme başarılı.");
     }
 }

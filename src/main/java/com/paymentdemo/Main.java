@@ -1,5 +1,6 @@
 package com.paymentdemo;
 
+import com.paymentdemo.model.PaymentResult;
 import com.paymentdemo.model.PaymentType;
 import com.paymentdemo.singleton.PaymentService;
 
@@ -43,7 +44,8 @@ public class Main {
 
                 try {
                     BigDecimal amount = new BigDecimal(amountInput);
-                    paymentService.processPayment(paymentType, amount);
+                    PaymentResult paymentResult = paymentService.processPayment(paymentType, amount);
+                    printPaymentResult(paymentResult);
                 } catch (NumberFormatException exception) {
                     System.out.println("Geçersiz tutar. Lütfen sayısal bir değer girin.");
                 } catch (IllegalArgumentException exception) {
@@ -62,5 +64,27 @@ public class Main {
             case "3" -> PaymentType.DIGITAL_WALLET;
             default -> null;
         };
+    }
+
+    private static void printPaymentResult(PaymentResult paymentResult) {
+        System.out.println("\n===== ÖDEME SONUCU =====");
+        System.out.printf("İşlem ID: %s%n", paymentResult.transactionId());
+        System.out.printf("Ödeme Yöntemi: %s%n", displayName(paymentResult.paymentType()));
+        System.out.printf("Tutar: %s TL%n", formatAmount(paymentResult.amount()));
+        System.out.printf("Durum: %s%n", paymentResult.status());
+        System.out.printf("Mesaj: %s%n", paymentResult.message());
+        System.out.println("=========================");
+    }
+
+    private static String displayName(PaymentType paymentType) {
+        return switch (paymentType) {
+            case CREDIT_CARD -> "Kredi Kartı";
+            case BANK_TRANSFER -> "Havale / EFT";
+            case DIGITAL_WALLET -> "Dijital Cüzdan";
+        };
+    }
+
+    private static String formatAmount(BigDecimal amount) {
+        return amount.stripTrailingZeros().toPlainString();
     }
 }
